@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt";
 
 @Injectable()
@@ -23,11 +24,11 @@ export class AuthService {
         userEmail: CreateUserDto.userEmail
       }
     })
-    
     if(!user) throw new NotFoundException();
     const match = await bcrypt.compare(CreateUserDto.userPassword, user.userPassword)
     if (!match) throw new UnauthorizedException("No estas autorizado");
-    return;
+    const token = jwt.sign(JSON.stringify(user), "SECRET KEY");
+    return token;
   }
 
 }
